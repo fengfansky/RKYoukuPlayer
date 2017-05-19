@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:rokid="http:www.rokid-inc.com" rokid:version="1.0.0">
+    <application rokid:isSystem="false">
+        <scene rokid:activity="com.youku.player.ddemo.MainActivity"
+            rokid:appID="493FF9CD309A48A2B344D505D5E2948F" />
+    </application>
+</manifest>
