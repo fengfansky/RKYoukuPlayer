@@ -27,6 +27,15 @@ public class YoukuSearchProcessor {
     private static final String TAG = "YoukuSearchProcessor";
     private static final String APP_PACKAGE = "com.yunos.tv.homeshell";
 
+
+    public static YoukuSearchProcessor getInstance() {
+        return SearchHolder.instance;
+    }
+
+    private static class SearchHolder {
+        private static final YoukuSearchProcessor instance = new YoukuSearchProcessor();
+    }
+
     private YunosTvsearchCheckinstallappGetResponse getCheckInstallApp() {
         TopApi topApi = TopApi.getInstance();
 
@@ -61,64 +70,69 @@ public class YoukuSearchProcessor {
 
         Log.d(TAG, "result  : " + response.getBody());
 
-        if (response.getBody() == null)
+        if (response.getBody() == null) {
+            vidResponseCallback.processErrorResult();
             return;
+        }
 
         TvSearchResponseBody tvSearchBody = new Gson().fromJson(response.getBody(), TvSearchResponseBody.class);
 
-        if (tvSearchBody == null)
+        if (tvSearchBody == null) {
+            vidResponseCallback.processErrorResult();
             return;
+        }
 
         TvSearchResponseBody.YunosTvsearchDataSearchResponseBean searchResponse = tvSearchBody.getYunos_tvsearch_data_search_response();
 
-        if (searchResponse == null)
+        if (searchResponse == null) {
+            vidResponseCallback.processErrorResult();
             return;
+        }
 
         TvSearchResponseBody.YunosTvsearchDataSearchResponseBean.ModelBean model = searchResponse.getModel();
         if (model == null) {
-            Log.i(TAG, "model invalidate");
+            Log.i(TAG, "result model invalidate");
+            vidResponseCallback.processErrorResult();
             return;
         }
 
         List<TvSearchResponseBody.YunosTvsearchDataSearchResponseBean.ModelBean.ListBeanX.ResultBean> resultBeanList = model.getList().getResult();
 
         if (resultBeanList == null || resultBeanList.isEmpty()) {
-            Log.d(TAG, " resultBeanList invalidate");
+            Log.d(TAG, " result resultBeanList invalidate");
+            vidResponseCallback.processErrorResult();
             return;
         }
+
+        boolean isVidExist = false;
 
         for (TvSearchResponseBody.YunosTvsearchDataSearchResponseBean.ModelBean.ListBeanX.ResultBean resultBean : resultBeanList) {
             TvSearchResponseBody.YunosTvsearchDataSearchResponseBean.ModelBean.ListBeanX.ResultBean.ListBean dataList = resultBean.getList();
             if (dataList == null) {
-                Log.d(TAG, " result.getList invalidate!");
-                return;
+                Log.d(TAG, "result result.getList invalidate!");
+                continue;
             }
             List<TvSearchResponseBody.YunosTvsearchDataSearchResponseBean.ModelBean.ListBeanX.ResultBean.ListBean.DataBean> data = dataList.getData();
             if (data == null) {
-                Log.d(TAG, " bean invalidate");
-                return;
+                Log.d(TAG, "result bean invalidate");
+                continue;
             }
             for (TvSearchResponseBody.YunosTvsearchDataSearchResponseBean.ModelBean.ListBeanX.ResultBean.ListBean.DataBean dataBean : data) {
                 if (dataBean == null) {
-                    Log.d(TAG, "dataBean invalidate");
+                    Log.d(TAG, "result dataBean invalidate");
                     continue;
                 }
 
                 int showType = dataBean.getShow_type();
-                /*if (showType != 3){
-                    Log.d(TAG,"showType !=3 不是电影！");
-                    continue;
-                }*/
-               /* String uri = dataBean.getUri();
-                if (!TextUtils.isEmpty(uri)){
-                    vidResponseCallback.processVideoUri(uri);
-                    return;
-                }*/
-
 
                 String pId = dataBean.getId();
                 if (TextUtils.isEmpty(pId)) {
-                    Log.i(TAG, "pId invalidate! ");
+                    Log.i(TAG, "result pId invalidate! ");
+                    continue;
+                }
+
+                if (!keyword.equals(dataBean.getMatch_word())) {
+                    Log.i(TAG, "result keyword not match continue!");
                     continue;
                 }
 
@@ -127,18 +141,20 @@ public class YoukuSearchProcessor {
                 try {
                     boolean isGetVid = getVid(pId, showType, vidResponseCallback);
                     if (!isGetVid) {
-                        vidResponseCallback.processEmptyResult(pId);
+                        vidResponseCallback.processNoVidResult(pId);
+                        continue;
                     } else {
+                        isVidExist = isGetVid;
                         return;
                     }
                 } catch (Throwable throwable) {
                     throwable.printStackTrace();
                 }
-//                }else {
-//                    vidResponseCallback.processEmptyResult(null);
-//                }
 
             }
+        }
+        if (!isVidExist) {
+            vidResponseCallback.processErrorResult();
         }
     }
 
@@ -183,18 +199,21 @@ public class YoukuSearchProcessor {
         vidResponseCallback.processVideoList(videoList);
 
         String vid = videoList.get(0).getExtVideoStrId();
-        vidResponseCallback.processSuccessResult(vid);
+        String videoName = videoList.get(0).getRcTitle();
+        vidResponseCallback.processSuccessResult(vid, videoName);
 
-        Log.i(TAG, "result vid : " + vid);
+        Log.i(TAG, "result vid : " + vid + " videoName : " + videoName);
         return true;
     }
 
     public interface SearchVidResponseCallback {
         void processVideoList(List<SearchVidResponseBody.YoukuTvShowGetResponseBean.ResultBean.VideoBean> videoList);
 
-        void processSuccessResult(String vid);
+        void processSuccessResult(String vid, String videoName);
 
-        void processEmptyResult(String pid);
+        void processNoVidResult(String pid);
+
+        void processErrorResult();
 
         void processVideoUri(String uri);
     }

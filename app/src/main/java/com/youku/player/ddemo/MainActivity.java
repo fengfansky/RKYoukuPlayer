@@ -1,5 +1,4 @@
 package com.youku.player.ddemo;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -26,7 +25,7 @@ public class MainActivity extends Activity {
     private YoukuScreenView mYoukuScreenView;
     // 播放器实例
     private YoukuVideoPlayer mYoukuVideoPlayer;
-    private CommandProcessor intentProcessor;
+    private CommandController intentProcessor;
     private VideoCommand videoCommand;
 
     @Override
@@ -36,13 +35,13 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         initPlayer();
         initCommand();
-        intentProcessor.startParse(getIntent());
+        intentProcessor.startParseCommand(getIntent());
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        intentProcessor.startParse(intent);
+        intentProcessor.startParseCommand(intent);
         setIntent(intent);
     }
 
@@ -57,12 +56,12 @@ public class MainActivity extends Activity {
         // 设置播放器回调监听
         mYoukuVideoPlayer.setPlayerMonitor(mPlayerMonitor);
         // 设置当前播放清晰度(1-标清,2-高清,3-超清,4-1080P,5-4K)， 默认为高清
-        mYoukuVideoPlayer.setPreferDefinition(3);
+        mYoukuVideoPlayer.setPreferDefinition(4);
     }
 
     private void initCommand() {
-        intentProcessor = new CommandProcessor(this);
-        videoCommand = new VideoPlayCommand(mYoukuVideoPlayer);
+        intentProcessor = new CommandController(this);
+        videoCommand = new VideoPlayCommand(MainActivity.this, mYoukuVideoPlayer);
         intentProcessor.setVideoCommand(videoCommand);
     }
 
@@ -132,21 +131,18 @@ public class MainActivity extends Activity {
 
             Log.d(MainActivity.TAG, "onStartLoading");
         }
-
         // 已经为您跳过片尾, tail:片尾时长(秒)
         @Override
         public void onSkipTail(int tail) {
             Log.d(MainActivity.TAG, "onSkipTail");
 
         }
-
         // 已经为您跳过片头, head:片头时长(秒)
         @Override
         public void onSkipHeader(int head) {
             Log.d(MainActivity.TAG, "onSkipHeader");
 
         }
-
         // 暂停广告显示
         @Override
         public void onShowPauseAdvert() {
@@ -160,42 +156,36 @@ public class MainActivity extends Activity {
             Log.d(MainActivity.TAG, "onProgressUpdated currentPos : " + currentPosition + " ,duration : " + duration);
 
         }
-
         // 上一集下一集状态变化 boolean previous, boolean next
         @Override
         public void onPreviousNextStateChange(boolean previous, boolean next) {
             Log.d(MainActivity.TAG, "onPreviousNextStateChange");
 
         }
-
         // 视频开始准备
         @Override
         public void onPreparing() {
             Log.d(MainActivity.TAG, "onPreparing");
 
         }
-
         // 视频准备完成
         @Override
         public void onPrepared() {
             Log.d(MainActivity.TAG, "onPrepared");
 
         }
-
         // 自动连播并有播放列表时，当前集播放结束.
         @Override
         public void onPlayOver(PlayItemBuilder arg0) {
             Log.d(MainActivity.TAG, "onPlayOver");
 
         }
-
         // 播放对象发生变化
         @Override
         public void onPlayItemChanged(PlayItemBuilder builder, int index) {
 
             Log.d(MainActivity.TAG, "onPlayItemChanged");
         }
-
         // 视频开始播放
         @Override
         public void onPlay() {
@@ -209,14 +199,12 @@ public class MainActivity extends Activity {
             Log.d(MainActivity.TAG, "onPause");
 
         }
-
         // 视频加载成功
         @Override
         public void onLoadSuccess() {
             Log.d(MainActivity.TAG, "onLoadSuccess");
 
         }
-
         // 视频信息加载失败
         @Override
         public void onLoadFail(LoadFailure failure, HashMap<String, Object> params) {
@@ -230,35 +218,30 @@ public class MainActivity extends Activity {
             Log.d(MainActivity.TAG, "onVideoClick");
 
         }
-
         // 清晰度发生改变, change 0: 变换开始, 1:变换完成
         @Override
         public void onDefinitionChanged(int change) {
 
             Log.d(MainActivity.TAG, "onVideoClick");
         }
-
         // 硬解状态的回调
         @Override
         public void onDecodeChanged(boolean arg0, int arg1, int arg2) {
 
             Log.d(MainActivity.TAG, "onVideoClick");
         }
-
         // 视频播放完成
         @Override
         public void onComplete() {
             Log.d(MainActivity.TAG, "onVideoClick");
 
         }
-
         // 缓冲进度 size unit KB/S
         @Override
         public void onBufferingSize(int size) {
             Log.d(MainActivity.TAG, "onBufferingSize");
 
         }
-
         /**
          * 视频缓冲进度
          *
@@ -276,7 +259,6 @@ public class MainActivity extends Activity {
 
             Log.d(MainActivity.TAG, "onBuffering");
         }
-
         /**
          * 缓冲动作完成回调
          */

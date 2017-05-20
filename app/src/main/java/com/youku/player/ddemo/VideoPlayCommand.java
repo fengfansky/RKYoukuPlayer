@@ -1,5 +1,7 @@
 package com.youku.player.ddemo;
 
+import android.app.Activity;
+
 import com.youku.player.YoukuVideoPlayer;
 import com.youku.player.entity.PlayItemBuilder;
 import com.youku.player.manager.VideoSourceType;
@@ -12,8 +14,10 @@ public class VideoPlayCommand implements VideoCommand {
 
     private YoukuVideoPlayer mYoukuVideoPlayer;
     private boolean isStartedPlay;
+    private Activity mActivity;
 
-    public VideoPlayCommand(YoukuVideoPlayer youkuVideoPlayer) {
+    public VideoPlayCommand(Activity activity, YoukuVideoPlayer youkuVideoPlayer) {
+        mActivity = activity;
         this.mYoukuVideoPlayer = youkuVideoPlayer;
     }
 
@@ -59,10 +63,11 @@ public class VideoPlayCommand implements VideoCommand {
 
     @Override
     public void stopPlay() {
-        if (mYoukuVideoPlayer != null) {
+        /*if (mYoukuVideoPlayer != null) {
             mYoukuVideoPlayer.stop();
             isStartedPlay = false;
-        }
+        }*/
+        mActivity.finish();
     }
 
     @Override

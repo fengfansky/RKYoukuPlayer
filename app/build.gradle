@@ -46,8 +46,6 @@ android {
 dependencies {
 
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile 'com.squareup.okio:okio:1.13.0'
-    compile 'com.squareup.okhttp3:okhttp:3.8.0'
 
     //掌中测
 //    debugCompile 'com.android.support:support-v4:+'
@@ -55,7 +53,6 @@ dependencies {
 //    debugCompile 'com.alibaba.sdk.android.plugins:alisdk-appboard:1.6.0'
 //    debugCompile 'com.alibaba.sdk.android.plugins.jar:alisdk-utdid:0.0.1'
 //    debugCompile 'com.alibaba.sdk.android.plugins.jar:alisdk-appmonitor:0.0.1'
-//
 //    releaseCompile 'com.alibaba.sdk.android.plugins:alisdk-appboard-online:1.4.0'
 }
 
