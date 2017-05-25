@@ -43,6 +43,9 @@ public class CommandController {
     private static final String SKILL_PAUSE = "pausemovie";
     private static final String SKILL_RESUME = "resumemovie";
     private static final String SKILL_STOP = "stopmovie";
+    private static final String SKILL_FORWARD = "forward";
+    private static final String SKILL_BACKWARD = "backward";
+    private static final String SKILL_SEEKTO = "seek_to";
 
     // 测试视频vid
 //    private String vid = "XMTQxNjc1MDE0OA==";
@@ -80,20 +83,21 @@ public class CommandController {
         NLPBean nlpBean = new Gson().fromJson(nlp, NLPBean.class);
         String intentEnvent = nlpBean.getIntent();
 
-        Map<String, String> slots = nlpBean.getSlots();
-
-        final String movieName = slots.get("movie");
-        String director = slots.get("director");
-        String keyword = null;
-
-        if (!TextUtils.isEmpty(movieName)) {
-            keyword = movieName;
-        } else if (!TextUtils.isEmpty(director)) {
-            keyword = director;
-        }
+        Log.d(TAG,"result intentEvent : " + intentEnvent);
 
         switch (intentEnvent) {
             case SKILL_START:
+                Map<String, String> slots = nlpBean.getSlots();
+
+                final String movieName = slots.get("movie");
+                String director = slots.get("director");
+                String keyword = null;
+
+                if (!TextUtils.isEmpty(movieName)) {
+                    keyword = movieName;
+                } else if (!TextUtils.isEmpty(director)) {
+                    keyword = director;
+                }
                 if (videoCommand == null || TextUtils.isEmpty(keyword)) {
                     return;
                 }
@@ -165,7 +169,16 @@ public class CommandController {
                 break;
             case SKILL_STOP:
                 videoCommand.stopPlay();
-
+                break;
+            case SKILL_FORWARD:
+                videoCommand.forward();
+                break;
+            case SKILL_BACKWARD:
+                videoCommand.backward();
+                break;
+            case SKILL_SEEKTO:
+//                videoCommand.seekTo();
+                break;
         }
     }
 

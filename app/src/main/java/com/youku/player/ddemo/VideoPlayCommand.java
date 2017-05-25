@@ -1,6 +1,9 @@
 package com.youku.player.ddemo;
 
 import android.app.Activity;
+import android.content.Context;
+import android.media.AudioManager;
+import android.util.Log;
 
 import com.youku.player.YoukuVideoPlayer;
 import com.youku.player.entity.PlayItemBuilder;
@@ -12,12 +15,15 @@ import com.youku.player.manager.VideoSourceType;
 
 public class VideoPlayCommand implements VideoCommand {
 
+    private static final String TAG = "VideoPlayCommand";
     private YoukuVideoPlayer mYoukuVideoPlayer;
     private boolean isStartedPlay;
     private Activity mActivity;
+    private AudioManager audioManager;
 
     public VideoPlayCommand(Activity activity, YoukuVideoPlayer youkuVideoPlayer) {
         mActivity = activity;
+        audioManager = (AudioManager) activity.getSystemService(Context.AUDIO_SERVICE);
         this.mYoukuVideoPlayer = youkuVideoPlayer;
     }
 
@@ -67,11 +73,75 @@ public class VideoPlayCommand implements VideoCommand {
             mYoukuVideoPlayer.stop();
             isStartedPlay = false;
         }*/
+        mYoukuVideoPlayer.release();
         mActivity.finish();
     }
 
     @Override
     public boolean isStartedPlay() {
         return isStartedPlay;
+    }
+
+    @Override
+    public void seekTo(int time) {
+        int totalTime = mYoukuVideoPlayer.getDuration();
+        if ( time >= totalTime){
+            time = totalTime;
+        }
+        mYoukuVideoPlayer.seekTo(time);
+    }
+
+    @Override
+    public void forward() {
+        int totalTime = mYoukuVideoPlayer.getDuration();
+        int fastTime = totalTime/5;
+        Log.d(TAG, "command forward fastTime : " + fastTime + " totalTime : " + totalTime );
+        if (mYoukuVideoPlayer.canSeekForward()){
+            Log.d(TAG, "command forward execute : " + fastTime + " totalTime : " + totalTime );
+            mYoukuVideoPlayer.fastForward(fastTime);
+        }else {
+
+        }
+    }
+
+    @Override
+    public void backward() {
+        int totalTime = mYoukuVideoPlayer.getDuration();
+        int backwardTime = totalTime/5;
+        Log.d(TAG, "command backward backwardTime : " + backwardTime + " totalTime : " + totalTime );
+        if (mYoukuVideoPlayer.canSeekBackward()){
+            Log.d(TAG, "command backward execute : " + backwardTime + " totalTime : " + totalTime );
+            mYoukuVideoPlayer.fastBackward(backwardTime);
+        }else {
+
+        }
+    }
+
+    @Override
+    public void forward(int time) {
+        int totalTime = mYoukuVideoPlayer.getDuration();
+        if (time >= totalTime){
+            time = totalTime;
+        }
+        mYoukuVideoPlayer.seekTo(time);
+    }
+
+    @Override
+    public void backward(int time) {
+        int totalTime = mYoukuVideoPlayer.getDuration();
+        if (time >= totalTime){
+            time = totalTime;
+        }
+        mYoukuVideoPlayer.seekTo(time);
+    }
+
+    @Override
+    public void volumeUp() {
+
+    }
+
+    @Override
+    public void volumeDown() {
+
     }
 }

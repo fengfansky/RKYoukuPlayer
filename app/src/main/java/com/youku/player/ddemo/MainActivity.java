@@ -18,6 +18,9 @@ import com.youku.player.widget.YoukuScreenView;
 
 import java.util.HashMap;
 
+import rokid.os.RKTTS;
+import rokid.os.RKTTSCallback;
+
 public class MainActivity extends Activity {
 
     private static final String TAG = "MainActivityTEST";
@@ -33,9 +36,15 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate");
         setContentView(R.layout.activity_main);
+        welcomeTTS();
         initPlayer();
         initCommand();
         intentProcessor.startParseCommand(getIntent());
+    }
+
+    private void welcomeTTS() {
+        RKTTS tts = new RKTTS();
+        tts.speak("你要看什么呢？",new RKTTSCallback());
     }
 
     @Override
@@ -57,6 +66,8 @@ public class MainActivity extends Activity {
         mYoukuVideoPlayer.setPlayerMonitor(mPlayerMonitor);
         // 设置当前播放清晰度(1-标清,2-高清,3-超清,4-1080P,5-4K)， 默认为高清
         mYoukuVideoPlayer.setPreferDefinition(4);
+        // 设置播放统计回掉
+        mYoukuVideoPlayer.setPlayStatCallback(null);
     }
 
     private void initCommand() {

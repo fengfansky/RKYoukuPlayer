@@ -16,4 +16,18 @@ public interface VideoCommand {
     void stopPlay();
 
     boolean isStartedPlay();
+
+    void seekTo(int time);
+
+    void forward();
+
+    void backward();
+
+    void forward(int time);
+
+    void backward(int time);
+
+    void volumeUp();
+
+    void volumeDown();
 }
