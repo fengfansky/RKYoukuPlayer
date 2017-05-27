@@ -10,7 +10,7 @@
         <com.youku.player.widget.YoukuScreenView
             android:id="@+id/screen_container"
             android:layout_width="fill_parent"
-            android:layout_height="562dp"
+            android:layout_height="fill_parent"
             android:gravity="center" />
     </LinearLayout>
 

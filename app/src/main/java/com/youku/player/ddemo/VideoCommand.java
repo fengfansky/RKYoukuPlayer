@@ -23,9 +23,9 @@ public interface VideoCommand {
 
     void backward();
 
-    void forward(int time);
+    void forwardTime(int time);
 
-    void backward(int time);
+    void backwardTime(int time);
 
     void volumeUp();
 

@@ -67,7 +67,7 @@ public class MainActivity extends Activity {
         // 设置当前播放清晰度(1-标清,2-高清,3-超清,4-1080P,5-4K)， 默认为高清
         mYoukuVideoPlayer.setPreferDefinition(4);
         // 设置播放统计回掉
-        mYoukuVideoPlayer.setPlayStatCallback(null);
+//        mYoukuVideoPlayer.setPlayStatCallback(null);
     }
 
     private void initCommand() {
@@ -86,19 +86,21 @@ public class MainActivity extends Activity {
 
         Log.d(TAG, "onPause");
         // 设置数据统计结束状态
+        if (videoCommand != null)
         videoCommand.pausePlay();
-        mYoukuVideoPlayer.endSession(this);
+
+//        mYoukuVideoPlayer.endSession(this);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        // 设置数据统计开始状态
-        Log.d(TAG, "onResume startPlay : " + videoCommand.isStartedPlay());
         if (videoCommand.isStartedPlay()) {
+            Log.d(TAG, "onResume startPlay : " + videoCommand.isStartedPlay());
             videoCommand.resumePlay();
         }
-        mYoukuVideoPlayer.startSession(this);
+        // 设置数据统计开始状态
+//        mYoukuVideoPlayer.startSession(this);
     }
 
     @Override
@@ -112,7 +114,9 @@ public class MainActivity extends Activity {
         super.onDestroy();
         // 释放播放器资源
         Log.d(TAG, "onDestroy");
-        mYoukuVideoPlayer.release();
+        if (mYoukuVideoPlayer != null) {
+            mYoukuVideoPlayer.release();
+        }
     }
 
     @Override

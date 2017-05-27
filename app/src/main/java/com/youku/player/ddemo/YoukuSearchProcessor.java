@@ -18,6 +18,8 @@ import com.taobao.api.utils.CommUtils;
 
 import java.util.List;
 
+import cn.com.mma.mobile.tracking.util.Logger;
+
 /**
  * Created by fanfeng on 2017/5/18.
  */
@@ -26,6 +28,9 @@ public class YoukuSearchProcessor {
 
     private static final String TAG = "YoukuSearchProcessor";
     private static final String APP_PACKAGE = "com.yunos.tv.homeshell";
+
+    private static final String TV_MOVIE = "电影";
+    private static final String TV_SERIES = "电视剧";
 
 
     public static YoukuSearchProcessor getInstance() {
@@ -107,16 +112,28 @@ public class YoukuSearchProcessor {
         boolean isVidExist = false;
 
         for (TvSearchResponseBody.YunosTvsearchDataSearchResponseBean.ModelBean.ListBeanX.ResultBean resultBean : resultBeanList) {
+
+            if (resultBean == null) {
+                Logger.d("resultBean invalidate!!!");
+                continue;
+            }
+
+            if (!TV_MOVIE.equals(resultBean.getTitle())) {
+                Logger.d("result " + resultBean.getTitle() + " not movie, continue !");
+                continue;
+            }
+
             TvSearchResponseBody.YunosTvsearchDataSearchResponseBean.ModelBean.ListBeanX.ResultBean.ListBean dataList = resultBean.getList();
             if (dataList == null) {
                 Log.d(TAG, "result result.getList invalidate!");
                 continue;
             }
             List<TvSearchResponseBody.YunosTvsearchDataSearchResponseBean.ModelBean.ListBeanX.ResultBean.ListBean.DataBean> data = dataList.getData();
-            if (data == null) {
+            if (data == null || data.isEmpty()) {
                 Log.d(TAG, "result bean invalidate");
                 continue;
             }
+
             for (TvSearchResponseBody.YunosTvsearchDataSearchResponseBean.ModelBean.ListBeanX.ResultBean.ListBean.DataBean dataBean : data) {
                 if (dataBean == null) {
                     Log.d(TAG, "result dataBean invalidate");
@@ -131,15 +148,15 @@ public class YoukuSearchProcessor {
                     continue;
                 }
 
-                if (!keyword.equals(dataBean.getMatch_word())) {
-                    Log.i(TAG, "result keyword not match continue!");
+        /*        if (!keyword.equals(dataBean.getMatch_word())) {
+                    Log.i(TAG, "result keyword not match continue! keyword="+keyword+" matchword="+dataBean.getMatch_word());
                     continue;
-                }
+                }*/
 
                 Log.i(TAG, "dataBean title : " + dataBean.getTitle() + " pid : " + dataBean.getId());
 
                 try {
-                    boolean isGetVid = getVid(pId, showType, vidResponseCallback);
+                    boolean isGetVid = getVid(keyword, pId, showType, vidResponseCallback);
                     if (!isGetVid) {
                         vidResponseCallback.processNoVidResult(pId);
                         continue;
@@ -159,7 +176,7 @@ public class YoukuSearchProcessor {
     }
 
 
-    public boolean getVid(String pId, int showType, SearchVidResponseCallback vidResponseCallback) {
+    public boolean getVid(String keywrod, String pId, int showType, SearchVidResponseCallback vidResponseCallback) {
         YoukuRequest request = new YoukuRequest();
         request.setShowId(pId);
         TopApi topApi = TopApi.getInstance();
@@ -199,8 +216,8 @@ public class YoukuSearchProcessor {
         vidResponseCallback.processVideoList(videoList);
 
         String vid = videoList.get(0).getExtVideoStrId();
-        String videoName = videoList.get(0).getRcTitle();
-        vidResponseCallback.processSuccessResult(vid, videoName);
+        String videoName = videoList.get(0).getTitle();
+        vidResponseCallback.processSuccessResult(vid, keywrod);
 
         Log.i(TAG, "result vid : " + vid + " videoName : " + videoName);
         return true;

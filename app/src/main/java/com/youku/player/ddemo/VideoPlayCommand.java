@@ -20,10 +20,13 @@ public class VideoPlayCommand implements VideoCommand {
     private boolean isStartedPlay;
     private Activity mActivity;
     private AudioManager audioManager;
+    private int maxVolume;
 
     public VideoPlayCommand(Activity activity, YoukuVideoPlayer youkuVideoPlayer) {
         mActivity = activity;
         audioManager = (AudioManager) activity.getSystemService(Context.AUDIO_SERVICE);
+        audioManager.setStreamMute(AudioManager.STREAM_MUSIC, false);
+        maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
         this.mYoukuVideoPlayer = youkuVideoPlayer;
     }
 
@@ -45,35 +48,28 @@ public class VideoPlayCommand implements VideoCommand {
         //设置Player的datasource
         mYoukuVideoPlayer.setDataSource(builder);
         mYoukuVideoPlayer.play();
-        /*PlayItemBuilder playItemBuilder = new PlayItemBuilder(url,false, VideoSourceType.VIDEO_TYPE_NET);
-        playItemBuilder.setStartPosition(0);
-        mYoukuVideoPlayer.setDataSource(playItemBuilder);
-        mYoukuVideoPlayer.play();*/
 
         isStartedPlay = true;
     }
 
     @Override
     public void pausePlay() {
-        if (mYoukuVideoPlayer != null) {
-            mYoukuVideoPlayer.pause();
-        }
+        if (mYoukuVideoPlayer == null)
+            return;
+        mYoukuVideoPlayer.pause();
     }
 
     @Override
     public void resumePlay() {
-        if (mYoukuVideoPlayer != null) {
-            mYoukuVideoPlayer.play();
-        }
+        if (mYoukuVideoPlayer == null)
+            return;
+        mYoukuVideoPlayer.play();
     }
 
     @Override
     public void stopPlay() {
-        /*if (mYoukuVideoPlayer != null) {
-            mYoukuVideoPlayer.stop();
-            isStartedPlay = false;
-        }*/
-        mYoukuVideoPlayer.release();
+        if (mYoukuVideoPlayer == null)
+            return;
         mActivity.finish();
     }
 
@@ -84,64 +80,66 @@ public class VideoPlayCommand implements VideoCommand {
 
     @Override
     public void seekTo(int time) {
+        if (mYoukuVideoPlayer == null)
+            return;
         int totalTime = mYoukuVideoPlayer.getDuration();
-        if ( time >= totalTime){
+        if (time > totalTime) {
             time = totalTime;
+        } else if (time < 0) {
+            time = 0;
         }
+        Log.d(TAG, "command forward time : " + time + " totalTime : " + totalTime);
         mYoukuVideoPlayer.seekTo(time);
     }
 
     @Override
     public void forward() {
-        int totalTime = mYoukuVideoPlayer.getDuration();
-        int fastTime = totalTime/5;
-        Log.d(TAG, "command forward fastTime : " + fastTime + " totalTime : " + totalTime );
-        if (mYoukuVideoPlayer.canSeekForward()){
-            Log.d(TAG, "command forward execute : " + fastTime + " totalTime : " + totalTime );
-            mYoukuVideoPlayer.fastForward(fastTime);
-        }else {
-
-        }
+        if (mYoukuVideoPlayer == null)
+            return;
+        seekTo(mYoukuVideoPlayer.getCurrentPosition() + mYoukuVideoPlayer.getDuration() / 15);
     }
 
     @Override
     public void backward() {
-        int totalTime = mYoukuVideoPlayer.getDuration();
-        int backwardTime = totalTime/5;
-        Log.d(TAG, "command backward backwardTime : " + backwardTime + " totalTime : " + totalTime );
-        if (mYoukuVideoPlayer.canSeekBackward()){
-            Log.d(TAG, "command backward execute : " + backwardTime + " totalTime : " + totalTime );
-            mYoukuVideoPlayer.fastBackward(backwardTime);
-        }else {
-
-        }
+        if (mYoukuVideoPlayer == null)
+            return;
+        seekTo(mYoukuVideoPlayer.getCurrentPosition() - mYoukuVideoPlayer.getDuration() / 15);
     }
 
     @Override
-    public void forward(int time) {
-        int totalTime = mYoukuVideoPlayer.getDuration();
-        if (time >= totalTime){
-            time = totalTime;
-        }
-        mYoukuVideoPlayer.seekTo(time);
+    public void forwardTime(int time) {
+        if (mYoukuVideoPlayer == null)
+            return;
+        seekTo(mYoukuVideoPlayer.getCurrentDefinition() + time);
     }
 
     @Override
-    public void backward(int time) {
-        int totalTime = mYoukuVideoPlayer.getDuration();
-        if (time >= totalTime){
-            time = totalTime;
-        }
-        mYoukuVideoPlayer.seekTo(time);
+    public void backwardTime(int time) {
+        if (mYoukuVideoPlayer == null)
+            return;
+        seekTo(mYoukuVideoPlayer.getCurrentDefinition() - time);
     }
+
 
     @Override
     public void volumeUp() {
-
+        if (audioManager == null)
+            return;
+        int positionVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC) + maxVolume / 8;
+        if (positionVolume > maxVolume) {
+            positionVolume = maxVolume;
+        }
+        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, positionVolume, 0);
     }
 
     @Override
     public void volumeDown() {
-
+        if (audioManager == null)
+            return;
+        int positionVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC) - maxVolume / 8;
+        if (positionVolume < 0) {
+            positionVolume = 0;
+        }
+        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, positionVolume, 0);
     }
 }

@@ -226,8 +226,9 @@ public class CommUtils {
             systemInfo.put("uuid", uuid);
             systemInfo.put("sw", getSWValue(context));
             systemInfo.put("from", 7);
-
-            systemInfo.put("device_media", getMediaParams());
+            systemInfo.put("bcp", 7);
+            systemInfo.put("device_media", "dts,dolby,drm,h265_720p");
+//            systemInfo.put("device_media", getMediaParams());
             String areaCode = getSystemProperties("persist.sys.asr.areacode");
             if (null != areaCode) {
                 systemInfo.put("area_code", areaCode);

@@ -46,6 +46,8 @@ public class CommandController {
     private static final String SKILL_FORWARD = "forward";
     private static final String SKILL_BACKWARD = "backward";
     private static final String SKILL_SEEKTO = "seek_to";
+    private static final String SKILL_VOLUME_UP = "volume_up";
+    private static final String SKILL_VOLUME_DOWN = "volume_down";
 
     // 测试视频vid
 //    private String vid = "XMTQxNjc1MDE0OA==";
@@ -176,8 +178,14 @@ public class CommandController {
             case SKILL_BACKWARD:
                 videoCommand.backward();
                 break;
-            case SKILL_SEEKTO:
-//                videoCommand.seekTo();
+            case SKILL_VOLUME_UP:
+                videoCommand.volumeUp();
+                break;
+            case SKILL_VOLUME_DOWN:
+                videoCommand.volumeDown();
+                break;
+            default:
+                Logger.d("command unknow!!! " + intentEnvent);
                 break;
         }
     }
