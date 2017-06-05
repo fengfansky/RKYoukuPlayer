@@ -9,6 +9,8 @@ import com.youku.player.YoukuVideoPlayer;
 import com.youku.player.entity.PlayItemBuilder;
 import com.youku.player.manager.VideoSourceType;
 
+import cn.com.mma.mobile.tracking.util.Logger;
+
 /**
  * Created by fanfeng on 2017/5/14.
  */
@@ -110,14 +112,15 @@ public class VideoPlayCommand implements VideoCommand {
     public void forwardTime(int time) {
         if (mYoukuVideoPlayer == null)
             return;
-        seekTo(mYoukuVideoPlayer.getCurrentDefinition() + time);
+        Log.d(TAG, "forward currentPosition: " + mYoukuVideoPlayer.getCurrentPosition() + "time : " + time);
+        seekTo(mYoukuVideoPlayer.getCurrentPosition() + time);
     }
 
     @Override
     public void backwardTime(int time) {
         if (mYoukuVideoPlayer == null)
             return;
-        seekTo(mYoukuVideoPlayer.getCurrentDefinition() - time);
+        seekTo(mYoukuVideoPlayer.getCurrentPosition() - time);
     }
 
 

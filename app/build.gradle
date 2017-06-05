@@ -53,6 +53,7 @@ dependencies {
 //    debugCompile 'com.alibaba.sdk.android.plugins.jar:alisdk-utdid:0.0.1'
 //    debugCompile 'com.alibaba.sdk.android.plugins.jar:alisdk-appmonitor:0.0.1'
 //    releaseCompile 'com.alibaba.sdk.android.plugins:alisdk-appboard-online:1.4.0'
+
     compile 'com.github.ctiao:DanmakuFlameMaster:0.8.3'
     compile 'com.github.ctiao:ndkbitmap-armv7a:0.8.3'
 }

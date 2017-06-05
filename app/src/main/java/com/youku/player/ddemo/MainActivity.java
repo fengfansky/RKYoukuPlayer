@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.widget.PopupWindow;
 
 import com.youku.player.LoadFailure;
 import com.youku.player.PlayerError;
@@ -17,9 +18,6 @@ import com.youku.player.manager.VideoPlayType;
 import com.youku.player.widget.YoukuScreenView;
 
 import java.util.HashMap;
-
-import rokid.os.RKTTS;
-import rokid.os.RKTTSCallback;
 
 public class MainActivity extends Activity {
 
@@ -36,16 +34,15 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate");
         setContentView(R.layout.activity_main);
-        welcomeTTS();
+//        imageView = (ImageView) findViewById(R.id.youku);
+//        welcomeTTS();
+
         initPlayer();
         initCommand();
         intentProcessor.startParseCommand(getIntent());
     }
 
-    private void welcomeTTS() {
-        RKTTS tts = new RKTTS();
-        tts.speak("你要看什么呢？",new RKTTSCallback());
-    }
+
 
     @Override
     protected void onNewIntent(Intent intent) {
@@ -68,6 +65,7 @@ public class MainActivity extends Activity {
         mYoukuVideoPlayer.setPreferDefinition(4);
         // 设置播放统计回掉
 //        mYoukuVideoPlayer.setPlayStatCallback(null);
+        //mYoukuScreenView.showLoadingPageView(BitmapFactory.decodeResource(getResources(), R.drawable.youku), View.VISIBLE);
     }
 
     private void initCommand() {
@@ -187,7 +185,6 @@ public class MainActivity extends Activity {
         @Override
         public void onPrepared() {
             Log.d(MainActivity.TAG, "onPrepared");
-
         }
         // 自动连播并有播放列表时，当前集播放结束.
         @Override

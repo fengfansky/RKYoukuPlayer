@@ -11,11 +11,11 @@ import android.util.Log;
 import com.google.gson.Gson;
 import com.taobao.api.response.SearchVidResponseBody;
 import com.youku.bean.NLPBean;
+import com.youku.util.TimeParserUtil;
 
 import java.util.List;
 import java.util.Map;
 
-import cn.com.mma.mobile.tracking.util.Logger;
 import rokid.os.RKTTS;
 import rokid.os.RKTTSCallback;
 
@@ -70,22 +70,25 @@ public class CommandController {
     public void startParseCommand(Intent intent) {
         if (isIntentValidate(intent)) {
             Log.d(TAG, "result startParseCommand intent invalidate!");
+            welcomeTTS();
             return;
         }
         String nlp = intent.getStringExtra(KEY_NLP);
+        Log.d(TAG, "result  Nlp ---> " + nlp);
+
         if (TextUtils.isEmpty(nlp)) {
             Log.d(TAG, "result NLP is empty!!!");
+            welcomeTTS();
             return;
         }
+
         searchProcessor = YoukuSearchProcessor.getInstance();
         rktts = new RKTTS();
-
-        Log.d(TAG, "result  Nlp ---> " + nlp);
 
         NLPBean nlpBean = new Gson().fromJson(nlp, NLPBean.class);
         String intentEnvent = nlpBean.getIntent();
 
-        Log.d(TAG,"result intentEvent : " + intentEnvent);
+        Log.d(TAG, "result intentEvent : " + intentEnvent + "  slots " + nlpBean.getSlots());
 
         switch (intentEnvent) {
             case SKILL_START:
@@ -105,7 +108,7 @@ public class CommandController {
                 }
 
                 final String finalKeyword = keyword;
-                Logger.d("result finalKeyword " + keyword);
+                Log.d(TAG, "nlp result finalKeyword " + keyword);
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
@@ -149,7 +152,6 @@ public class CommandController {
 
                             @Override
                             public void processVideoUri(String uri) {
-
                                 Log.d(TAG, "result processVideoUri uri " + uri);
                                 Message message = new Message();
                                 message.what = MSG_TYPE_URI;
@@ -172,20 +174,38 @@ public class CommandController {
             case SKILL_STOP:
                 videoCommand.stopPlay();
                 break;
-            case SKILL_FORWARD:
-                videoCommand.forward();
-                break;
-            case SKILL_BACKWARD:
-                videoCommand.backward();
-                break;
             case SKILL_VOLUME_UP:
                 videoCommand.volumeUp();
                 break;
             case SKILL_VOLUME_DOWN:
                 videoCommand.volumeDown();
                 break;
+            case SKILL_SEEKTO:
+                Map<String, String> timeSlots = nlpBean.getSlots();
+                Log.d(TAG, "nlp timeSlots : " + timeSlots);
+                videoCommand.seekTo(TimeParserUtil.parseTime(timeSlots));
+                break;
+            case SKILL_FORWARD:
+                Map<String, String> forwardTimeSlots = nlpBean.getSlots();
+                Log.d(TAG, "nlp forwardTimeSlots : " + forwardTimeSlots);
+                if (forwardTimeSlots == null || forwardTimeSlots.isEmpty()) {
+                    videoCommand.forward();
+                } else {
+                    videoCommand.forwardTime(TimeParserUtil.parseTime(forwardTimeSlots));
+                }
+                break;
+            case SKILL_BACKWARD:
+                Map<String, String> backwardTimeSlots = nlpBean.getSlots();
+                Log.d(TAG, "nlp backwardTimeSlots : " + backwardTimeSlots);
+                if (backwardTimeSlots == null || backwardTimeSlots.isEmpty()) {
+                    videoCommand.backward();
+                } else {
+                    videoCommand.backwardTime(TimeParserUtil.parseTime(backwardTimeSlots));
+                }
+                break;
             default:
-                Logger.d("command unknow!!! " + intentEnvent);
+                welcomeTTS();
+                Log.d(TAG, "welcome 你要看什么呢？ " + intentEnvent);
                 break;
         }
     }
@@ -196,7 +216,7 @@ public class CommandController {
 
             switch (msg.what) {
                 case MSG_NO_RESULT:
-                    rktts.speak("亲爱的，我还没有这个资源哦！", new RKTTSCallback());
+                    rktts.speak("抱歉，暂时没有这部电影。试试找找看其他电影吧！", new RKTTSCallback());
 
                 case MSG_TYPE_URI:
                     String uri = (String) msg.getData().get(MSG_URI);
@@ -208,9 +228,9 @@ public class CommandController {
                 case MSG_TYPE_VID:
                     String videoName = (String) msg.getData().get(MSG_NAME);
                     if (TextUtils.isEmpty(videoName)) {
-                        rktts.speak("亲爱的，我要开始播放了哦！", new RKTTSCallback());
+                        rktts.speak("好的，即将为您播放该影片！", new RKTTSCallback());
                     } else {
-                        rktts.speak("亲爱的，我来为你播放" + videoName, new RKTTSCallback());
+                        rktts.speak("好的，即将为您播放" + videoName, new RKTTSCallback());
                     }
                     String vid = (String) msg.getData().get(MSG_VID);
                     if (!TextUtils.isEmpty(vid)) {
@@ -231,5 +251,10 @@ public class CommandController {
             return true;
         }
         return false;
+    }
+
+    private void welcomeTTS() {
+        RKTTS tts = new RKTTS();
+        tts.speak("欢迎来到优酷电影，请问您想看哪一部电影？", new RKTTSCallback());
     }
 }
