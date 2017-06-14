@@ -9,8 +9,6 @@ import com.youku.player.YoukuVideoPlayer;
 import com.youku.player.entity.PlayItemBuilder;
 import com.youku.player.manager.VideoSourceType;
 
-import cn.com.mma.mobile.tracking.util.Logger;
-
 /**
  * Created by fanfeng on 2017/5/14.
  */
@@ -42,7 +40,7 @@ public class VideoPlayCommand implements VideoCommand {
 
     @Override
     public void startPlay(String vid) {
-
+        Log.i(TAG, "startPlay vid " + vid);
         // 用VID初始化PlayItemBuilder
         PlayItemBuilder builder = new PlayItemBuilder(vid);
         // 设置播放开始时间， 有播放记录的情况下，设置播放记录开始播放的位置,单位(秒)

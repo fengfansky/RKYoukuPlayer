@@ -15,9 +15,9 @@ public class DemoApplicaion extends Application {
     // 是否打开LOG开关, true:打开, false:关闭
     private static boolean isDebug = true;
     // 是否使用测试地址, true: 使用测试地址, false:使用正式地址
-    private static boolean isTestHost = true;
+    private static boolean isTestHost = false;
     // 是否初始化日志目录, true:初始化, false:不初始化
-    private static boolean isInitLogDir = true;
+    private static boolean isInitLogDir = false;
     // 客户端类型，固定值
     private static String cType = "30";
     // 应用程序的名称

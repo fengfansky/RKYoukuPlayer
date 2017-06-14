@@ -72,7 +72,10 @@ public class YoukuSearchProcessor {
 
 
         YunosTvsearchDataSearchResponse response = (YunosTvsearchDataSearchResponse) topApi.execute(request);
-
+        if (response == null) {
+            Log.d(TAG, " response null !!!");
+            return;
+        }
         Log.d(TAG, "result  : " + response.getBody());
 
         if (response.getBody() == null) {

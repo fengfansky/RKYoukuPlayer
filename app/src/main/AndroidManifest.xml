@@ -14,13 +14,14 @@
     <application
         android:name="com.youku.player.ddemo.DemoApplicaion"
         android:allowBackup="true"
-        android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
+        android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+        android:hardwareAccelerated="false">
         <activity
             android:name="com.youku.player.ddemo.MainActivity"
+            android:launchMode="singleTask"
             android:screenOrientation="landscape">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

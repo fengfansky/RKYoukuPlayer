@@ -39,6 +39,7 @@ public class CommandController {
     private static final int MSG_TYPE_URI = 1;
     private static final int MSG_TYPE_VID = 2;
 
+    private static final String SKILL_WELCOME = "ROKID.INTENT.WELCOME";
     private static final String SKILL_START = "playmovie";
     private static final String SKILL_PAUSE = "pausemovie";
     private static final String SKILL_RESUME = "resumemovie";
@@ -49,15 +50,22 @@ public class CommandController {
     private static final String SKILL_VOLUME_UP = "volume_up";
     private static final String SKILL_VOLUME_DOWN = "volume_down";
 
+    private boolean isStarted;
     // 测试视频vid
 //    private String vid = "XMTQxNjc1MDE0OA==";
 //    private String vid = "XMTU3NDc4MzU1Ng==";
+
+    private ImageController mImageController;
 
     private YoukuSearchProcessor searchProcessor;
     private VideoCommand videoCommand;
 
     Context mContext;
     private RKTTS rktts;
+
+    public void setImageController(ImageController imageController) {
+        mImageController = imageController;
+    }
 
     public CommandController(Context mContext) {
         this.mContext = mContext;
@@ -70,7 +78,6 @@ public class CommandController {
     public void startParseCommand(Intent intent) {
         if (isIntentValidate(intent)) {
             Log.d(TAG, "result startParseCommand intent invalidate!");
-            welcomeTTS();
             return;
         }
         String nlp = intent.getStringExtra(KEY_NLP);
@@ -92,6 +99,9 @@ public class CommandController {
 
         switch (intentEnvent) {
             case SKILL_START:
+                if (mImageController != null) {
+                    mImageController.dismiss();
+                }
                 Map<String, String> slots = nlpBean.getSlots();
 
                 final String movieName = slots.get("movie");
@@ -163,7 +173,7 @@ public class CommandController {
                         });
                     }
                 }).start();
-
+                isStarted = true;
                 break;
             case SKILL_PAUSE:
                 videoCommand.pausePlay();
@@ -203,9 +213,13 @@ public class CommandController {
                     videoCommand.backwardTime(TimeParserUtil.parseTime(backwardTimeSlots));
                 }
                 break;
-            default:
+            case SKILL_WELCOME:
                 welcomeTTS();
-                Log.d(TAG, "welcome 你要看什么呢？ " + intentEnvent);
+                break;
+            default:
+                //TODO unKnow
+//                welcomeTTS();
+                Log.d(TAG, "unKnow command !!! " + intentEnvent);
                 break;
         }
     }
@@ -256,5 +270,15 @@ public class CommandController {
     private void welcomeTTS() {
         RKTTS tts = new RKTTS();
         tts.speak("欢迎来到优酷电影，请问您想看哪一部电影？", new RKTTSCallback());
+        if (mImageController != null) {
+            mImageController.show();
+        }
     }
+
+    public interface ImageController {
+        void show();
+
+        void dismiss();
+    }
+
 }
