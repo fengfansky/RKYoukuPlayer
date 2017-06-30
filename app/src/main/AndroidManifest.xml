@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.youku.player.ddemo">
+    package="com.rokid.movie">
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
@@ -12,12 +12,12 @@
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
 
     <application
-        android:name="com.youku.player.ddemo.DemoApplicaion"
+        android:name="com.rokid.movie.YouKuMovieApplicaion"
         android:allowBackup="true"
         android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
         android:hardwareAccelerated="false">
         <activity
-            android:name="com.youku.player.ddemo.MainActivity"
+            android:name="com.rokid.movie.activity.MainActivity"
             android:launchMode="singleTask"
             android:screenOrientation="landscape">
             <intent-filter>
