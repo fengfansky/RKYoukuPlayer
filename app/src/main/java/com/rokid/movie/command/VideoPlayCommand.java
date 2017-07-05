@@ -63,7 +63,9 @@ public class VideoPlayCommand implements VideoCommand {
     public void resumePlay() {
         if (mYoukuVideoPlayer == null)
             return;
-        mYoukuVideoPlayer.play();
+        if (isStartedPlay) {
+            mYoukuVideoPlayer.play();
+        }
     }
 
     @Override
@@ -71,6 +73,13 @@ public class VideoPlayCommand implements VideoCommand {
         if (mYoukuVideoPlayer == null)
             return;
         mActivity.finish();
+    }
+
+    @Override
+    public void releasePlayer() {
+        if (mYoukuVideoPlayer == null)
+            return;
+        mYoukuVideoPlayer.release();
     }
 
     @Override

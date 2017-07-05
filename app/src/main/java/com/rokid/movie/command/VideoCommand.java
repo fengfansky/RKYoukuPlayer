@@ -15,6 +15,8 @@ public interface VideoCommand {
 
     void stopPlay();
 
+    void releasePlayer();
+
     boolean isStartedPlay();
 
     void seekTo(int time);

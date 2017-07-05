@@ -2,6 +2,6 @@
 <manifest xmlns:rokid="http:www.rokid-inc.com" rokid:version="1.0.0">
     <application rokid:isSystem="false">
         <scene rokid:activity="com.rokid.movie.activity.MainActivity"
-            rokid:appID="493FF9CD309A48A2B344D505D5E2948F" />
+            rokid:appID="R5F8EFDADC684D2BBE15DF1C618C84B1" />
     </application>
 </manifest>

@@ -31,7 +31,7 @@ public class MainActivity extends Activity {
     private YoukuScreenView mYoukuScreenView;
     // 播放器实例
     private YoukuVideoPlayer mYoukuVideoPlayer;
-    private CommandController intentProcessor;
+    private CommandController commandController;
     private VideoCommand videoCommand;
     private ImageView imageView;
 
@@ -44,7 +44,7 @@ public class MainActivity extends Activity {
 
         initPlayer();
         initCommand();
-        intentProcessor.setImageController(new CommandController.ImageController() {
+        commandController.setImageController(new CommandController.ImageController() {
             @Override
             public void show() {
                 imageView.setVisibility(View.VISIBLE);
@@ -57,13 +57,13 @@ public class MainActivity extends Activity {
                 mYoukuScreenView.setVisibility(View.VISIBLE);
             }
         });
-        intentProcessor.startParseCommand(getIntent());
+        commandController.startParseCommand(getIntent());
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        intentProcessor.startParseCommand(intent);
+        commandController.startParseCommand(intent);
         setIntent(intent);
     }
 
@@ -81,15 +81,12 @@ public class MainActivity extends Activity {
         mYoukuVideoPlayer.setPreferDefinition(4);
         // 设置播放统计回掉
 
-
-//        mYoukuVideoPlayer.setPlayStatCallback(null);
-        //mYoukuScreenView.showLoadingPageView(BitmapFactory.decodeResource(getResources(), R.drawable.youku), View.VISIBLE);
     }
 
     private void initCommand() {
-        intentProcessor = new CommandController(this);
+        commandController = new CommandController(this);
         videoCommand = new VideoPlayCommand(MainActivity.this, mYoukuVideoPlayer);
-        intentProcessor.setVideoCommand(videoCommand);
+        commandController.setVideoCommand(videoCommand);
     }
 
     private void playIndex(int index) {
@@ -111,10 +108,9 @@ public class MainActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (videoCommand.isStartedPlay()) {
-            Log.d(TAG, "onResume startPlay : " + videoCommand.isStartedPlay());
+        Log.d(TAG, "onResume startPlay : " + videoCommand.isStartedPlay());
+        if (videoCommand != null)
             videoCommand.resumePlay();
-        }
         // 设置数据统计开始状态
 //        mYoukuVideoPlayer.startSession(this);
     }
@@ -129,10 +125,9 @@ public class MainActivity extends Activity {
     protected void onDestroy() {
         super.onDestroy();
         // 释放播放器资源
-        Log.d(TAG, "onDestroy");
-        if (mYoukuVideoPlayer != null) {
-            mYoukuVideoPlayer.release();
-        }
+        Log.d(TAG, "onDestroy videoCommand releasePlayer");
+        if (videoCommand != null)
+            videoCommand.releasePlayer();
     }
 
     @Override
@@ -202,6 +197,8 @@ public class MainActivity extends Activity {
         @Override
         public void onPreparing() {
             Log.d(MainActivity.TAG, "onPreparing");
+            imageView.setVisibility(View.INVISIBLE);
+            mYoukuScreenView.setVisibility(View.VISIBLE);
         }
 
         // 视频准备完成
